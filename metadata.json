@@ -1,0 +1,6 @@
+{
+  "name": "RentMate: Rental Recommendation System",
+  "description": "A clever house recommendation system featuring personalized search, AI-driven filtering, and content-based recommendation logic for finding the perfect rental home.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

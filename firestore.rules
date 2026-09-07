@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- SHARED HELPERS ---
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128; }
+
+    // --- VALIDATION HELPERS ---
+    function isValidListing(data) {
+      return data.keys().hasAll(['title', 'price', 'location', 'bhk']) &&
+             data.title is string && data.title.size() < 200 &&
+             data.price is number && data.price > 0 &&
+             data.location is string &&
+             data.bhk is number && data.bhk > 0;
+    }
+
+    function isValidProfile(data) {
+      return (data.get('budgetMax', 100000) is number) &&
+             (data.get('preferredLocation', '') is string) &&
+             (data.get('preferredBhk', 0) is number);
+    }
+
+    // --- COLLECTIONS ---
+
+    match /listings/{listingId} {
+      // Anyone can see listings
+      allow read: if true;
+      // Only signed in users can create house listings (Simplified for this app)
+      allow create: if isSignedIn() && isValidListing(incoming());
+      // Only owner can update (Simulated by checking ownerId if present)
+      allow update: if isSignedIn() && isValidListing(incoming()) && (existing().get('ownerId', '') == request.auth.uid);
+      allow delete: if isSignedIn() && (existing().get('ownerId', '') == request.auth.uid);
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && isValidProfile(incoming());
+    }
+  }
+}

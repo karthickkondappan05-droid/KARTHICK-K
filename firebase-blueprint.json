@@ -1,0 +1,43 @@
+{
+  "entities": {
+    "Listing": {
+      "title": "House Listing",
+      "description": "A rental house listing",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "price": { "type": "number" },
+        "location": { "type": "string" },
+        "bhk": { "type": "number" },
+        "amenities": { "type": "array", "items": { "type": "string" } },
+        "imageUrl": { "type": "string" },
+        "description": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "price", "location", "bhk"]
+    },
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "User preferences for recommendations",
+      "type": "object",
+      "properties": {
+        "budgetMax": { "type": "number" },
+        "preferredLocation": { "type": "string" },
+        "preferredBhk": { "type": "number" },
+        "requiredAmenities": { "type": "array", "items": { "type": "string" } },
+        "favorites": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "firestore": {
+    "listings/{listingId}": {
+      "schema": "Listing",
+      "description": "Global house listings"
+    },
+    "users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User specific data and preferences"
+    }
+  }
+}
